@@ -1,3 +1,8 @@
+'''
+这个版本只关注路程最短
+'''
+
+
 import math
 import random
 import matplotlib.pyplot as plt
