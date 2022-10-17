@@ -94,20 +94,18 @@ def fitness(route_distance, sum_demand):
 
 #模拟退火算法
 def SA(T_begin,T_end,alpha,L,Distance_matrix,Demand_matrix):                    #T_begin初始温度;T_end终止温度;alpha降温系数;L迭代次数
-
-    best_fitness = 0
-    best_route = []
     tabu_list = []                                                              #空禁忌列表
     old_route = init_route()                                                    #产生初始路径route0赋值给old_route
     T = T_begin                                                                 #当前温度等于初始温度
     cnt = 0                                                                     #计数器 用于输出报文时的序号 “第 cnt 次 ...”
     Shortestlength_list = []                                                    #记录每种温度情况下得到的最短路径距离
     Fitness_list = []                                                           #记录每种温度情况下得到的最小适应度
+    best_fitness_list = []                                                      #记录历史最优适应度的列表
     Route_list = []                                                             #记录每种温度情况下得到的最小适应度对应的路线
     while T > T_end:                                                            #如果当前温度大于终止温度
         for i in range(L):                                                      #循环L次
             new_route,tabu_list = creat_newRoute(old_route,tabu_list)           #扰动产生新路径
-            if len(tabu_list) > 100:                                              #如果禁忌列表长度≥4，那么清空禁忌列表
+            if len(tabu_list) > 0:                                              #如果禁忌列表长度≥4，那么清空禁忌列表
                 tabu_list.pop(0)
             old_dist = totaldistance(old_route,Distance_matrix)                 #计算旧路径的长度
             new_dist = totaldistance(new_route,Distance_matrix)                 #计算新路径的长度
@@ -120,9 +118,6 @@ def SA(T_begin,T_end,alpha,L,Distance_matrix,Demand_matrix):                    
                     old_route = new_route
             else:                                                               #否则，必然接受新路线
                 old_route = new_route
-                # if new_fitness < best_fitness:
-                #     best_fitness = new_fitness
-                #     best_route = new_route
         T = T * alpha                                                           #降温
         cnt += 1                                                                #计数器
         Shortestlength = totaldistance(old_route,Distance_matrix)               #当前路径长度（更新后的旧路径）
@@ -130,7 +125,8 @@ def SA(T_begin,T_end,alpha,L,Distance_matrix,Demand_matrix):                    
         Fitness_list.append(fitness(Shortestlength,totaldemand(10,old_route,Distance_matrix,Demand_matrix)))
                                                                                 #把当前适应度加入列表
         Route_list.append(old_route)                                            #把当前适应度对应的路线加入列表
-        # print(cnt,"次降温，温度为：",T," 路程长度为：", Shortestlength,"适应度：",fitness(Shortestlength,totaldemand(10,old_route,Distance_matrix,Demand_matrix)))
+        best_fitness_list.append(min(Fitness_list))  # 记录当前历史最优适应度，用于作图
+        print(cnt,"次降温，温度为：",T," 路程长度为：", Shortestlength,"适应度：",fitness(Shortestlength,totaldemand(10,old_route,Distance_matrix,Demand_matrix)))
                                                                                 #报文
     optimal_route = old_route                                                   #当温度降到终止温度，把此时的旧路线作为最优路线
     optimal_distance = totaldistance(optimal_route,Distance_matrix)             #计算最优路线的路程长度
@@ -140,12 +136,14 @@ def SA(T_begin,T_end,alpha,L,Distance_matrix,Demand_matrix):                    
     print("本次独立运行 最优路线：",optimal_route)                                  #打印最优路线
     print("本次独立运行 满足需求量：",optimal_demand)                               #打印需求满足量
     print("本次独立运行 适应度：", optimal_fitness)                                   # 打印适应度
-    # plt.plot(Shortestlength_list)                                               #绘制单次运行若干次降温的最优长度折线图
-    # plt.savefig("SA+tabu KILLS TSP A single run length.png")                    #保存到项目目录下命名为XXX
-    # plt.clf()                                                                   #清空画布
+
     plt.plot(Fitness_list)                                                      #绘制适应度曲线
-    plt.savefig('SA+tabu fitness (5 times)' + str(T_begin) + ' ' + str(T_end) + ' ' + str(alpha) + ' ' + str(L) + '.png')#保存到项目目录下命名为XXX
-    best_fitness = min(Fitness_list)
+    # plt.savefig('SA+tabu fitness (5 times)' + str(T_begin) + ' ' + str(T_end) + ' ' + str(alpha) + ' ' + str(L) + '.png')#保存到项目目录下命名为XXX
+    best_fitness = min(Fitness_list)                #导出历史最优适应度
+
+    plt.plot(best_fitness_list)                                                 #绘制历史最优适应度曲线
+    plt.savefig('SA+tabu best fitness (5 times)' + str(T_begin) + ' ' + str(T_end) + ' ' + str(alpha) + ' ' + str(L) + '.png')
+
     index = Fitness_list.index(best_fitness)        #记录最优适应度的下标
     best_route = Route_list[index]                  #导出对应下表的路线
     return optimal_distance,optimal_route,optimal_demand,optimal_fitness,best_fitness,best_route                 #输出最优路程长度和最优路径
