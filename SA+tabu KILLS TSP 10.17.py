@@ -1,5 +1,5 @@
 '''
-2022.10.16版本
+2022.10.17版本
 '''
 
 
@@ -136,14 +136,11 @@ def SA(T_begin,T_end,alpha,L,Distance_matrix,Demand_matrix):                    
     print("本次独立运行 最优路线：",optimal_route)                                  #打印最优路线
     print("本次独立运行 满足需求量：",optimal_demand)                               #打印需求满足量
     print("本次独立运行 适应度：", optimal_fitness)                                   # 打印适应度
-
-    plt.plot(Fitness_list)                                                      #绘制适应度曲线
+    # plt.plot(Fitness_list)                                                      #绘制适应度曲线，如果不想波动曲线与折线重合，就把这条注释掉
     # plt.savefig('SA+tabu fitness (5 times)' + str(T_begin) + ' ' + str(T_end) + ' ' + str(alpha) + ' ' + str(L) + '.png')#保存到项目目录下命名为XXX
     best_fitness = min(Fitness_list)                #导出历史最优适应度
-
     plt.plot(best_fitness_list)                                                 #绘制历史最优适应度曲线
     plt.savefig('SA+tabu best fitness (5 times)' + str(T_begin) + ' ' + str(T_end) + ' ' + str(alpha) + ' ' + str(L) + '.png')
-
     index = Fitness_list.index(best_fitness)        #记录最优适应度的下标
     best_route = Route_list[index]                  #导出对应下表的路线
     return optimal_distance,optimal_route,optimal_demand,optimal_fitness,best_fitness,best_route                 #输出最优路程长度和最优路径
